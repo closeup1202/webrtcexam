@@ -12,7 +12,17 @@ module.exports = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      width: {
+        '128': '32rem',
+      }
     },
+    fontFamily:{
+      sans: ['var(--font-inter)'],
+      mono: ['var(--font-roboto-mono)'],
+      cinzel :['var(--font-cinzel)'],
+      notosanskr :['var(--font-notosanskr)'],
+      phudu:['var(--font-phudu)']
+    }
   },
   plugins: [],
 }
