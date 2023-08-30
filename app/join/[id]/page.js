@@ -1,68 +1,63 @@
 'use client'
 
-import JoinBtn from "@/app/components/joinRoomBtn";
-import { useState, useEffect } from "react";
-import { constraints } from "@/utils/webrtc/frame";
+import { useState, useEffect, useRef } from "react";
+import { getWebcam } from "@/utils/webrtc/device";
 import Image from "next/image";
 import cameraOff from "@/public/images/cameraoff.png"
 import cameraOn from "@/public/images/cameraon.png"
 import micOff from "@/public/images/micoff.png"
 import micOn from "@/public/images/micon.png"
+import Link from "next/link";
 
 export default function Join(){
-  let [camera, setCamera] = useState(true)
-  let localStream;
-  let localStreamOn;
+  const [video, setVideo] = useState(undefined)
+  const [audio, setAudio] = useState(undefined)
+  const videoRef = useRef(null)
 
   useEffect(()=>{
     if (typeof window !== 'undefined'){
-      navigator.mediaDevices.getUserMedia(constraints)
-      .then(stream => { 
-        console.log('Got MediaStream:', stream);
-        localStream = stream;
-        const video = document.querySelector('video#localVideo');
-        video.srcObject = stream;
-      })
-      .catch(error => { console.error('Error accessing media devices.', error); });
+      getWebcam(stream => {
+        videoRef.current.srcObject = stream
+        setVideo(true)
+        setAudio(true)
+      });
     }
   }, [])
 
-  const videoSwitch = () => {
-    console.log(localStreamOn)
-
-    if(localStream && camera){
-      const videoTrack = localStream.getVideoTracks();
-      videoTrack.forEach(track => {
-        localStream.removeTrack(track);
-        const video = document.querySelector('video#localVideo');
-        video.srcObject = localStream;
-        console.log("camera off")
-      });
-    } else {
-      console.log(localStreamOn);
-      console.log("camera on")
-    }
-    setCamera(!camera);
+  const toggleVideo = () => {
+    const videoStream = videoRef.current.srcObject
+    if(videoStream != null && videoStream.getVideoTracks().length > 0){
+      setVideo(!video)
+      videoStream.getVideoTracks()[0].enabled = !video
+    } 
   }
-
-  async function getConnectedDevices(type) {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    return devices.filter(device => device.kind === type)
-  }
+  
+  const toggleMic = () => {
+    const videoStream = videoRef.current.srcObject
+    if(videoStream != null && videoStream.getAudioTracks().length > 0){
+      setAudio(!audio)
+      videoStream.getAudioTracks()[0].enabled = !audio
+    } 
+  }   
 
   return(
     <div className="text-center">
-      <p className='text-center mt-20 font-phudu font-bold text-5xl'>Welcome to 채팅방 변수</p>
-      <video width={390} className='border-2 border-lime-400 rounded-lg bg-black mx-auto mt-20' id='localVideo' autoPlay controls={false}/>
+      <p className='text-center mt-10 font-phudu font-bold text-5xl text-emerald-900'>Welcome to vtwspring</p>
+      <video ref={videoRef} width={350} className='rounded-lg bg-black mx-auto mt-10' autoPlay controls={false}/>
       <div className="mt-5">
-        <button onClick={()=>{videoSwitch()}} className="rounded-full bg-emerald-900 p-3 mx-5 hover:bg-red-700 hover:text-fuchsia-100">
-          <Image src={cameraOn} width={40} height={40} alt=""></Image>
+        <button onClick={()=>{toggleVideo()}} 
+              className={`${video ? 'bg-emerald-900 hover:bg-red-700' : 'bg-red-700 hover:bg-emerald-900'} rounded-3xl p-2 mx-2`}>
+          <Image src={video ? cameraOn : cameraOff} width={30} height={30} alt=""></Image>
         </button>
-        <button onClick={()=>{console.log(localStream)}} className="rounded-full bg-emerald-900 hover:bg-red-700 p-3 mx-5">
-          <Image src={micOn} width={40} height={40} alt=""></Image>
+        <button onClick={()=>{toggleMic()}} 
+              className={`${audio ? 'bg-emerald-900 hover:bg-red-700' : 'bg-red-700 hover:bg-emerald-900'} rounded-3xl p-2 mx-2`}>
+          <Image src={audio ? micOn : micOff} width={30} height={30} alt=""></Image>
         </button>
       </div>
-      <JoinBtn/>
+      <div className="text-center mt-10 w-96 mx-auto">
+        <Link href={'/test'} className='inline-block w-full rounded-xl p-4 hover:bg-emerald-900 hover:text-white font-phudu font-extrabold'>join</Link>
+        <Link href={'/'} className='inline-block w-full rounded-xl mt-3 p-4 hover:bg-orange-600 hover:text-white font-phudu font-extrabold'>home</Link>
+      </div>
     </div>
   )
 }
