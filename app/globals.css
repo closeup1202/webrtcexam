@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components{
+  .deviceBtnHoverPositive{
+    @apply bg-emerald-900 hover:bg-emerald-800
+  }
+  .deviceBtnHoverNegative{
+    @apply bg-red-700 hover:bg-red-800
+  }
+}
+
 video
 {
     transform: rotateY(180deg);

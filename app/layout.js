@@ -1,7 +1,7 @@
 import './globals.css'
 import { font } from '@/utils/font/font'
 import Image from 'next/image'
-import mainbg from "@/public/images/mainbg.jpg"
+// import mainbg from "@/public/images/mainbg.jpg"
 
 export const metadata = {
   title: 'WEE! MEET',
